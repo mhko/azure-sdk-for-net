@@ -19,6 +19,47 @@ namespace Microsoft.Azure.Search.Tests
 
     public sealed class IndexingTests : SearchTestBase<IndexFixture>
     {
+
+        [Fact]
+        public void CanIndexDynamicDocumentsGenerated()
+        {
+            Run(() =>
+            {
+                SearchIndexClient client = Data.GetSearchIndexClient();
+                
+                IndexingRequest indexingRequest = new IndexingRequest();
+                indexingRequest.Value = new List<XIndexAction>()
+                {
+                    new XIndexAction()
+                    {
+                        Searchaction = "upload",
+                        AdditionalProperties = new Dictionary<string, object>()
+                        {
+                            { "hotelId", "1" },
+                            { "baseRate", 199.0 },
+                            { "description", "Best hotel in town" }
+                        }
+                    },
+                    new XIndexAction()
+                    {
+                        Searchaction = "upload",
+                        AdditionalProperties = new Dictionary<string, object>()
+                        {
+                            { "hotelId", "2" },
+                            { "baseRate", 79.99 },
+                            { "description", "Cheapest hotel in town" }
+                        }
+                    }
+                };
+
+                DocumentIndexResult documentIndexResult = client.DocumentsProxy.DocumentIndexPostWithHttpMessagesAsync(indexingRequest).Result.Body;
+
+                Assert.Equal(2, documentIndexResult.Results.Count);
+                AssertIndexActionSucceeded("1", documentIndexResult.Results[0], 201);
+                AssertIndexActionSucceeded("2", documentIndexResult.Results[1], 201);
+            });
+        }
+
         [Fact]
         [Trait(TestTraits.AcceptanceType, TestTraits.LiveBVT)]
         public void CanIndexDynamicDocuments()

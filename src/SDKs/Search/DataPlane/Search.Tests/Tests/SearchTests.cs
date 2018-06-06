@@ -19,6 +19,31 @@ namespace Microsoft.Azure.Search.Tests
     // the mock recording/playback to work properly.
     public abstract class SearchTests : QueryTests
     {
+        // Work in progress. Search for all docs (*) in test test index. 
+        protected void TestCanSearchDynamicDocumentsGenerated()
+        {
+            SearchIndexClient client = GetClientForQuery();
+
+            var searchParameters = new XSearchParameters()
+            {
+                HighlightPreTag = "<b>",
+                HighlightPostTag = "</b>"
+            };
+
+            string searchText = "*";
+
+            AzureOperationResponse<XDocumentSearchResult> response =
+                client.DocumentsProxy.SearchGetWithHttpMessagesAsync(searchText, searchParameters).Result;
+
+            IList<XSearchDocument> documents = response.Body.Value;
+            foreach (XSearchDocument document in documents)
+            {
+                // AdditioanlProperties correspond to fields of this index.
+                IDictionary<string, object> fields = document.AdditionalProperties;
+            }
+            Assert.Equal(Data.TestDocuments.Length, documents.Count);
+        }
+
         protected void TestCanSearchStaticallyTypedDocuments()
         {
             SearchIndexClient client = GetClientForQuery();

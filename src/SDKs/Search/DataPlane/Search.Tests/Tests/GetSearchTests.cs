@@ -10,6 +10,12 @@ namespace Microsoft.Azure.Search.Tests
     public class GetSearchTests : SearchTests
     {
         [Fact]
+        public void CanSearchDynamicDocumentsGenerated()
+        {
+            Run(TestCanSearchDynamicDocumentsGenerated);
+        }
+
+        [Fact]
         public void CanSearchStaticallyTypedDocuments()
         {
             Run(TestCanSearchStaticallyTypedDocuments);
