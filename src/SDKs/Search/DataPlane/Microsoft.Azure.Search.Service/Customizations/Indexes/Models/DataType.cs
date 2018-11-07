@@ -49,6 +49,11 @@ namespace Microsoft.Azure.Search.Models
         /// </summary>
         public static readonly DataType GeographyPoint = new DataType("Edm.GeographyPoint");
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static readonly DataType ComplexType = new DataType("Edm.ComplexType");
+
         private DataType(string typeName) : base(typeName)
         {
             // Base class does all initialization.

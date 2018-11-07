@@ -12,25 +12,18 @@ namespace Microsoft.Azure.Search.Models
     /// behavior of a field.
     /// <see href="https://docs.microsoft.com/rest/api/searchservice/Create-Index" />
     /// </summary>
-    public class Field
+    public class Field : BaseField
     {
-        /// <summary>
-        /// Initializes a new instance of the Field class.
-        /// </summary>
-        public Field()
-        {
-            this.IsRetrievable = true;
-        }
-
         /// <summary>
         /// Initializes a new instance of the Field class with required arguments.
         /// </summary>
         /// <param name="name">The name of the field.</param>
         /// <param name="dataType">The data type of the field.</param>
-        public Field(string name, DataType dataType) : this()
+        public Field(string name, DataType dataType)
+            : base(name)
         {
-            Name = name;
-            Type = dataType;
+            this.Type = dataType;
+            this.IsRetrievable = true;
         }
 
         /// <summary>
@@ -42,7 +35,6 @@ namespace Microsoft.Azure.Search.Models
         public Field(string name, AnalyzerName analyzerName)
             : this(name, DataType.String, analyzerName)
         {
-            // Do nothing.
         }
 
         /// <summary>
@@ -58,13 +50,6 @@ namespace Microsoft.Azure.Search.Models
             this.Analyzer = analyzerName;
             this.IsSearchable = true;
         }
-
-        /// <summary>
-        /// Gets or sets the name of the field.
-        /// <see href="https://docs.microsoft.com/rest/api/searchservice/Naming-rules" />
-        /// </summary>
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the data type of the field.
@@ -117,7 +102,7 @@ namespace Microsoft.Azure.Search.Models
         /// exactly one key field.
         /// </summary>
         [JsonProperty("key")]
-        public bool IsKey { get; set; } 
+        public bool IsKey { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the field is included in
@@ -164,10 +149,6 @@ namespace Microsoft.Azure.Search.Models
             if (Name == null)
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "Name");
-            }
-            if (Type == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "Type");
             }
         }
     }

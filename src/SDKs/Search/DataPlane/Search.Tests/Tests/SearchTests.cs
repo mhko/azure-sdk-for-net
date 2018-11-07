@@ -58,7 +58,8 @@ namespace Microsoft.Azure.Search.Tests
             {
                 Assert.Equal(1, response.Results[i].Score);
                 Assert.Null(response.Results[i].Highlights);
-                Assert.Equal(Data.TestDocuments[i].AsDocument(), response.Results[i].Document);
+                Document expectedDocument = Data.TestDocuments[i].AsDocument();
+                Assert.Equal(expectedDocument, response.Results[i].Document);
             }
         }
 
@@ -251,7 +252,8 @@ namespace Microsoft.Azure.Search.Tests
 
             SearchIndexClient client = GetClientForQuery();
             Index index = searchClient.Indexes.Get(client.IndexName);
-            index.Fields.First(f => f.Name == "hotelName").SynonymMaps = new[] { synonymMapName };
+            Field field = index.Fields.First(f => f.Name == "hotelName") as Field;
+            field.SynonymMaps = new[] { synonymMapName };
 
             searchClient.Indexes.CreateOrUpdate(index);
 

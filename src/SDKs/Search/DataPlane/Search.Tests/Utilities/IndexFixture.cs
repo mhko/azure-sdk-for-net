@@ -5,9 +5,11 @@
 namespace Microsoft.Azure.Search.Tests.Utilities
 {
     using System;
+    using System.Collections.Generic;
     using System.Net.Http;
     using Microsoft.Azure.Search.Models;
     using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
+    using Newtonsoft.Json;
 
     public class IndexFixture : SearchServiceFixture
     {
@@ -28,12 +30,12 @@ namespace Microsoft.Azure.Search.Tests.Utilities
                 new Index()
                 {
                     Name = IndexName,
-                    Fields = new[]
+                    Fields = new List<BaseField>()
                     {
-                        new Field("hotelId", DataType.String) { IsKey = true, IsFilterable = true, IsSortable = true, IsFacetable = true },
+                        new Field("hotelId", DataType.String) { IsKey = true, IsFilterable = true, IsSortable = true, IsFacetable = true, IsRetrievable = true},
                         new Field("baseRate", DataType.Double) { IsFilterable = true, IsSortable = true, IsFacetable = true },
                         new Field("description", DataType.String) { IsSearchable = true },
-                        new Field("descriptionFr", AnalyzerName.FrLucene),
+                        new Field("descriptionFr", DataType.String) { IsSearchable = true, Analyzer = AnalyzerName.FrLucene },
                         new Field("hotelName", DataType.String) { IsSearchable = true, IsFilterable = true, IsSortable = true, IsFacetable = true },
                         new Field("category", DataType.String) { IsSearchable = true, IsFilterable = true, IsSortable = true, IsFacetable = true },
                         new Field("tags", DataType.Collection(DataType.String)) { IsSearchable = true, IsFilterable = true, IsFacetable = true },
@@ -41,12 +43,22 @@ namespace Microsoft.Azure.Search.Tests.Utilities
                         new Field("smokingAllowed", DataType.Boolean) { IsFilterable = true, IsSortable = true, IsFacetable = true },
                         new Field("lastRenovationDate", DataType.DateTimeOffset) { IsFilterable = true, IsSortable = true, IsFacetable = true },
                         new Field("rating", DataType.Int32) { IsFilterable = true, IsSortable = true, IsFacetable = true },
-                        new Field("location", DataType.GeographyPoint) { IsFilterable = true, IsSortable = true }
+                        new Field("pastRatings", DataType.Collection(DataType.Double)) { IsKey = false, IsSearchable = false, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true  },
+                        new Field("pastAwards", DataType.Collection(DataType.Int32)) { IsKey = false, IsSearchable = false, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true  },
+                        new Field("location", DataType.GeographyPoint) { IsFilterable = true, IsSortable = true, IsRetrievable = true },
+                        new ComplexField("address") {},
+                        new Field("address/street", DataType.String) { IsKey = false, IsSearchable = true, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true },
+                        new Field("address/city", DataType.String) { IsKey = false, IsSearchable = true, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true },
+                        new ComplexField("rooms", isCollection: true),
+                        new Field("rooms/roomId", DataType.String) { IsKey = false, IsSearchable = true, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true  },
+                        new Field("rooms/type", DataType.String) { IsKey = false, IsSearchable = true, IsFilterable = false, IsSortable = false, IsFacetable = false, IsRetrievable = true  },
+                        new Field("rooms/baseRate", DataType.Double) { IsFilterable = true, IsFacetable = true },
+                        new Field("rooms/sleepCount", DataType.Int32) { IsFilterable = true, IsFacetable = true }
                     },
                     Suggesters = new[]
                     {
                         new Suggester(
-                            name: "sg", 
+                            name: "sg",
                             sourceFields: new[] { "description", "hotelName" })
                     },
                     ScoringProfiles = new[]
@@ -76,7 +88,7 @@ namespace Microsoft.Azure.Search.Tests.Utilities
         }
 
         public SearchIndexClient GetSearchIndexClientForQuery(
-            string indexName = null, 
+            string indexName = null,
             params DelegatingHandler[] handlers)
         {
             indexName = indexName ?? IndexName;
@@ -84,8 +96,8 @@ namespace Microsoft.Azure.Search.Tests.Utilities
         }
 
         private SearchIndexClient GetSearchIndexClientForKey(
-            string indexName, 
-            string apiKey, 
+            string indexName,
+            string apiKey,
             params DelegatingHandler[] handlers)
         {
             TestEnvironment currentEnvironment = TestEnvironmentFactory.GetTestEnvironment();

@@ -11,6 +11,7 @@ namespace Microsoft.Azure.Search.Serialization
     using Spatial;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Deserializes JSON objects and arrays to .NET types instead of JObject and JArray.
@@ -45,8 +46,7 @@ namespace Microsoft.Azure.Search.Serialization
 
             foreach (JProperty field in bag.Properties())
             {
-                // Skip OData @search annotations. These are deserialized separately.
-                if (field.Name.StartsWith("@search.", StringComparison.Ordinal))
+                if (field.Name.StartsWith("@search", StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Search.Serialization
 
                     if (array.Count == 0)
                     {
-                        // Assume string arrays for now.
+                        // Treat as string arrays, for backward compatibility.
                         value = EmptyStringArray;
                     }
                     else
@@ -72,10 +72,18 @@ namespace Microsoft.Azure.Search.Serialization
                 }
                 else if (field.Value is JObject)
                 {
-                    var tokenReader = new JTokenReader(field.Value);
-                    
-                    // Assume GeoPoint for now.
-                    value = serializer.Deserialize<GeographyPoint>(tokenReader);
+                    // TODO, nateko, revisit this try-parse chaining
+                    JObject jobject = field.Value as JObject;
+                    try
+                    {
+                        var tokenReader = new JTokenReader(jobject as JObject);
+                        value = serializer.Deserialize<GeographyPoint>(tokenReader);
+                    }
+                    catch (JsonSerializationException)
+                    {
+                        var tokenReader = new JTokenReader(jobject as JObject);
+                        value = serializer.Deserialize<Document>(tokenReader);
+                    }
                 }
                 else
                 {
@@ -93,13 +101,52 @@ namespace Microsoft.Azure.Search.Serialization
             throw new NotImplementedException();
         }
 
-        private static object[] ConvertArray(JArray array, JsonSerializer serializer)
+        private static object ConvertArray(JArray array, JsonSerializer serializer)
         {
-            // There are two cases to consider: Either everything is a string, or it's not. If not, don't attempt
-            // any conversions and return everything in an object array.
-            return array.All(t => t.Type == JTokenType.String || t.Type == JTokenType.Null) ? 
-                array.Select(t => t.Value<string>()).ToArray() : 
-                array.Select(t => t.ToObject(typeof(object), serializer)).ToArray();
+            if (array.All(t => t.Type == JTokenType.String || t.Type == JTokenType.Null))
+            {
+                return array.Select(t => t.Value<string>()).ToArray();
+            }
+            else if (array.All(t => t.Type == JTokenType.Boolean))
+            {
+                return array.Select(t => t.Value<bool>()).ToArray();
+            }
+            else if (array.All(t => t.Type == JTokenType.Integer))
+            {
+                return array.Select(t => t.Value<int>()).ToArray();
+            }
+            else if (array.All(t => t.Type == JTokenType.Float))
+            {
+                return array.Select(t => t.Value<double>()).ToArray();
+            }
+            else if (array.All(t => t.Type == JTokenType.Object))
+            {
+                // TODO, nateko, revisit this try-parse chaining 
+                try
+                {
+                    var list = new List<GeographyPoint>();
+                    foreach (var obj in array)
+                    {
+                        var tokenReader = new JTokenReader(obj as JObject);
+                        list.Add(serializer.Deserialize<GeographyPoint>(tokenReader));
+                    }
+                    return list.ToArray();
+                }
+                catch (JsonSerializationException)
+                {
+                    var list = new List<Document>();
+                    foreach (var obj in array)
+                    {
+                        var tokenReader = new JTokenReader(obj as JObject);
+                        list.Add(serializer.Deserialize<Document>(tokenReader));
+                    }
+                    return list.ToArray();
+                }
+            }
+            else
+            {
+                return array.Select(t => t.ToObject(typeof(object), serializer)).ToArray();
+            }
         }
     }
 }

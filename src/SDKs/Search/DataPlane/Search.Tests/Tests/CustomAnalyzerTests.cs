@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Search.Tests
                 Assert.Equal("1", result.Results.Single().Document["id"]);
             });
         }
-
+/*
         [Fact]
         public void CanUseAllAnalyzerNamesInIndexDefinition()
         {
@@ -111,7 +111,7 @@ namespace Microsoft.Azure.Search.Tests
                 client.Indexes.Create(index);
             });
         }
-
+*/
         [Fact]
         public void CanAnalyze()
         {

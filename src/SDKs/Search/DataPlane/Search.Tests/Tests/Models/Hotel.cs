@@ -9,6 +9,75 @@ namespace Microsoft.Azure.Search.Tests
     using Common;
     using Models;
     using Spatial;
+    
+    public class Address
+    {
+        public string Street { get; set; }
+        public string City { get; set; }
+
+        public Document AsDocument() =>
+            new Document()
+            {
+                ["street"] = Street,
+                ["city"] = City
+            };
+
+        public override bool Equals(object obj)
+        {
+            Address other = obj as Address;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return
+                Street == other.Street && City == other.City;
+        }
+
+        public override int GetHashCode() => 0;
+
+        public override string ToString() => $"Street: {Street}; City: {City};";
+    }
+
+    [SerializePropertyNamesAsCamelCase]
+    public class Room
+    {
+        public string RoomId { get; set; }
+
+        public string Type { get; set; }
+
+        public double? BaseRate { get; set; }
+
+        public int SleepCount { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            Room other = obj as Room;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return
+                RoomId == other.RoomId &&
+                Hotel.DoublesEqual(BaseRate, other.BaseRate) &&
+                Type == other.Type &&
+                SleepCount == other.SleepCount;
+        }
+
+        public override int GetHashCode() => RoomId?.GetHashCode() ?? 0;
+
+        public Document AsDocument() =>
+            new Document()
+            {
+                ["baseRate"] = BaseRate,
+                ["type"] = Type,
+                ["roomId"] = RoomId,
+                ["sleepCount"] = SleepCount
+            };
+    }
 
     [SerializePropertyNamesAsCamelCase]
     public class Hotel
@@ -35,7 +104,15 @@ namespace Microsoft.Azure.Search.Tests
 
         public int? Rating { get; set; }
 
+        public double[] PastRatings { get; set; }
+
+        public int[] PastAwards { get; set; }
+
         public GeographyPoint Location { get; set; }
+
+        public Address Address { get; set; }
+
+        public Room[] Rooms { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -58,6 +135,8 @@ namespace Microsoft.Azure.Search.Tests
                 SmokingAllowed == other.SmokingAllowed &&
                 DateTimeOffsetsEqual(LastRenovationDate, other.LastRenovationDate) &&
                 Rating == other.Rating &&
+                ((Rooms == null) ? (other.Rooms == null || other.Rooms.Length == 0) : Rooms.SequenceEqual(other.Rooms)) &&
+                Address.Equals(other.Address) &&
                 ((Location == null) ? other.Location == null : Location.Equals(other.Location));
         }
 
@@ -68,7 +147,8 @@ namespace Microsoft.Azure.Search.Tests
             $"Description (French): {DescriptionFr}; Name: {HotelName}; Category: {Category}; " +
             $"Tags: {Tags?.ToCommaSeparatedString() ?? "null"}; Parking: {ParkingIncluded}; " +
             $"Smoking: {SmokingAllowed}; LastRenovationDate: {LastRenovationDate}; Rating: {Rating}; " +
-            $"Location: [{Location?.Longitude ?? 0}, {Location?.Latitude ?? 0}]";
+            $"Location: [{Location?.Longitude ?? 0}, {Location?.Latitude ?? 0}]" +
+            $"Address: {Address.ToString()};";
 
         public Document AsDocument() =>
             new Document()
@@ -83,11 +163,15 @@ namespace Microsoft.Azure.Search.Tests
                 ["location"] = Location,
                 ["parkingIncluded"] = ParkingIncluded,
                 ["rating"] = Rating.HasValue ? (long?)Rating.Value : null, // JSON.NET always deserializes to int64
+                ["pastRatings"] = PastRatings != null ? PastRatings : new double[0],
+                ["pastAwards"] = PastAwards != null ? PastAwards: new int[0],
                 ["smokingAllowed"] = SmokingAllowed,
-                ["tags"] = Tags ?? new string[0]   // OData always gives [] instead of null for collections.
+                ["tags"] = Tags ?? new string[0],   // OData always gives [] instead of null for collections.
+                ["address"] = Address?.AsDocument(),
+                ["rooms"] = Rooms != null ? Rooms.Select(x => x.AsDocument()) : new Document[0]
             };
 
-        private static bool DoublesEqual(double? x, double? y)
+        public static bool DoublesEqual(double? x, double? y)
         {
             if (x == null)
             {

@@ -136,7 +136,7 @@ namespace Microsoft.Azure.Search.Tests
                 Index index = CreateTestIndex();
 
                 Index createdIndex = searchClient.Indexes.Create(index);
-                
+
                 AssertIndexesEqual(index, createdIndex);
             });
         }
@@ -149,7 +149,7 @@ namespace Microsoft.Azure.Search.Tests
                 SearchServiceClient searchClient = Data.GetSearchServiceClient();
 
                 Index inputIndex = CreateTestIndex();
-                
+
                 // Default values for field properties are tested elsewhere.
                 inputIndex.CorsOptions = new CorsOptions() { AllowedOrigins = new[] { "*" } };
                 inputIndex.ScoringProfiles = new[]
@@ -159,9 +159,9 @@ namespace Microsoft.Azure.Search.Tests
                         Functions = new ScoringFunction[]
                         {
                             new MagnitudeScoringFunction(
-                                "rating", 
-                                boost: 2.0, 
-                                boostingRangeStart: 1, 
+                                "rating",
+                                boost: 2.0,
+                                boostingRangeStart: 1,
                                 boostingRangeEnd: 4)
                         }
                     }
@@ -187,7 +187,8 @@ namespace Microsoft.Azure.Search.Tests
                 SearchServiceClient searchClient = Data.GetSearchServiceClient();
 
                 Index index = CreateTestIndex();
-                index.Fields[0].IsKey = false;
+                Field field = index.Fields[0] as Field;
+                field.IsKey = false;
 
                 const string ExpectedMessageFormat =
                     "The request is invalid. Details: index : Found 0 key fields in index '{0}'. " +
@@ -266,14 +267,15 @@ namespace Microsoft.Azure.Search.Tests
         {
             Run(() =>
             {
-                string synonymMapName = "names"; 
+                string synonymMapName = "names";
                 SearchServiceClient searchClient = Data.GetSearchServiceClient();
 
                 SynonymMap synonymMap = new SynonymMap(name: synonymMapName, format: SynonymMapFormat.Solr, synonyms: "hotel,motel");
                 searchClient.SynonymMaps.Create(synonymMap);
 
                 Index index = CreateTestIndex();
-                index.Fields.First(f => f.Name == "hotelName").SynonymMaps = new[] { synonymMapName };
+                Field field = index.Fields.First(f => f.Name == "hotelName") as Field;
+                field.SynonymMaps = new[] { synonymMapName };
 
                 Index createIndex = searchClient.Indexes.Create(index);
 
@@ -295,11 +297,16 @@ namespace Microsoft.Azure.Search.Tests
 
                 // create an index
                 Index index = CreateTestIndex();
-                index.Fields.First(f => f.Name == "hotelName").SynonymMaps = new[] { synonymMapName };
+
+                Field field = index.Fields.First(f => f.Name == "hotelName") as Field;
+                field.SynonymMaps = new[] { synonymMapName };
+
                 searchClient.Indexes.Create(index);
 
                 // update an index                
-                index.Fields.First(f => f.Name == "hotelName").SynonymMaps = new string [] { };
+                field = index.Fields.First(f => f.Name == "hotelName") as Field;
+                field.SynonymMaps = new string[] { };
+
                 Index updateIndex = searchClient.Indexes.CreateOrUpdate(index);
 
                 AssertIndexesEqual(index, updateIndex);
@@ -384,7 +391,7 @@ namespace Microsoft.Azure.Search.Tests
 
                 Index index = CreateTestIndex();
 
-                AzureOperationResponse<Index> createOrUpdateResponse = 
+                AzureOperationResponse<Index> createOrUpdateResponse =
                     searchClient.Indexes.CreateOrUpdateWithHttpMessagesAsync(index).Result;
                 Assert.Equal(HttpStatusCode.Created, createOrUpdateResponse.Response.StatusCode);
             });
@@ -401,11 +408,11 @@ namespace Microsoft.Azure.Search.Tests
                 Index index = CreateTestIndex();
 
                 // Try delete before the index even exists.
-                AzureOperationResponse deleteResponse = 
+                AzureOperationResponse deleteResponse =
                     searchClient.Indexes.DeleteWithHttpMessagesAsync(index.Name).Result;
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.Response.StatusCode);
 
-                AzureOperationResponse<Index> createResponse = 
+                AzureOperationResponse<Index> createResponse =
                     searchClient.Indexes.CreateWithHttpMessagesAsync(index).Result;
                 Assert.Equal(HttpStatusCode.Created, createResponse.Response.StatusCode);
 
@@ -447,7 +454,7 @@ namespace Microsoft.Azure.Search.Tests
                 searchClient.Indexes.Create(index);
 
                 searchClient.Indexes.Delete(index.Name);
-                
+
                 Assert.False(searchClient.Indexes.Exists(index.Name));
             });
         }

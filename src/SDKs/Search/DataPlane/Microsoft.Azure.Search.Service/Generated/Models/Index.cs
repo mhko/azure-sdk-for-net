@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Search.Models
         /// <param name="charFilters">The character filters for the
         /// index.</param>
         /// <param name="eTag">The ETag of the index.</param>
-        public Index(string name, IList<Field> fields, IList<ScoringProfile> scoringProfiles = default(IList<ScoringProfile>), string defaultScoringProfile = default(string), CorsOptions corsOptions = default(CorsOptions), IList<Suggester> suggesters = default(IList<Suggester>), IList<Analyzer> analyzers = default(IList<Analyzer>), IList<Tokenizer> tokenizers = default(IList<Tokenizer>), IList<TokenFilter> tokenFilters = default(IList<TokenFilter>), IList<CharFilter> charFilters = default(IList<CharFilter>), string eTag = default(string))
+        public Index(string name, IList<BaseField> fields, IList<ScoringProfile> scoringProfiles = default(IList<ScoringProfile>), string defaultScoringProfile = default(string), CorsOptions corsOptions = default(CorsOptions), IList<Suggester> suggesters = default(IList<Suggester>), IList<Analyzer> analyzers = default(IList<Analyzer>), IList<Tokenizer> tokenizers = default(IList<Tokenizer>), IList<TokenFilter> tokenFilters = default(IList<TokenFilter>), IList<CharFilter> charFilters = default(IList<CharFilter>), string eTag = default(string))
         {
             Name = name;
             Fields = fields;
@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Search.Models
         /// Gets or sets the fields of the index.
         /// </summary>
         [JsonProperty(PropertyName = "fields")]
-        public IList<Field> Fields { get; set; }
+        public IList<BaseField> Fields { get; set; }
 
         /// <summary>
         /// Gets or sets the scoring profiles for the index.

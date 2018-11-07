@@ -7,6 +7,7 @@ namespace Microsoft.Azure.Search
     using System;
     using System.Net.Http;
     using Common;
+    using Microsoft.Azure.Search.Serialization;
     using Rest;
 
     public partial class SearchServiceClient
@@ -64,6 +65,12 @@ namespace Microsoft.Azure.Search
             SearchServiceName = searchServiceName;
 
             Credentials.InitializeServiceClient(this);
+        }
+
+        partial void CustomInitialize()
+        {
+            SerializationSettings = JsonUtility.CreateSerializerSettings(SerializationSettings);
+            DeserializationSettings = JsonUtility.CreateDeserializerSettings(DeserializationSettings);
         }
 
         private static void ValidateSearchServiceName(string searchServiceName)
