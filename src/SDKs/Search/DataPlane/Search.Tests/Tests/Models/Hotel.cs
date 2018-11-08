@@ -135,8 +135,10 @@ namespace Microsoft.Azure.Search.Tests
                 SmokingAllowed == other.SmokingAllowed &&
                 DateTimeOffsetsEqual(LastRenovationDate, other.LastRenovationDate) &&
                 Rating == other.Rating &&
-                ((Rooms == null) ? (other.Rooms == null || other.Rooms.Length == 0) : Rooms.SequenceEqual(other.Rooms)) &&
-                Address.Equals(other.Address) &&
+                ((PastRatings == null) ? (other.PastRatings == null || other.PastRatings.Length == 0) : PastRatings.SequenceEqual(other.PastRatings ?? new double[0])) &&
+                ((PastAwards == null) ? (other.PastAwards == null || other.PastAwards.Length == 0) : PastAwards.SequenceEqual(other.PastAwards ?? new int[0])) &&
+                ((Rooms == null) ? (other.Rooms == null || other.Rooms.Length == 0) : Rooms.SequenceEqual(other.Rooms ?? new Room[0])) &&
+                ((Address == null) ? other.Address == null : Address.Equals(other.Address)) &&
                 ((Location == null) ? other.Location == null : Location.Equals(other.Location));
         }
 
@@ -147,8 +149,12 @@ namespace Microsoft.Azure.Search.Tests
             $"Description (French): {DescriptionFr}; Name: {HotelName}; Category: {Category}; " +
             $"Tags: {Tags?.ToCommaSeparatedString() ?? "null"}; Parking: {ParkingIncluded}; " +
             $"Smoking: {SmokingAllowed}; LastRenovationDate: {LastRenovationDate}; Rating: {Rating}; " +
+            $"PastRatings: {PastRatings?.ToCommaSeparatedString() ?? "null"}; " +
+            $"PastAwards: {PastAwards?.ToCommaSeparatedString() ?? "null"}; " +
+            $"LastRenovationDate: {LastRenovationDate}; Rating: {Rating}; " +
             $"Location: [{Location?.Longitude ?? 0}, {Location?.Latitude ?? 0}]" +
-            $"Address: {Address.ToString()};";
+            $"Address: {Address.ToString()};" +
+            $"Rooms: {Rooms?.ToCommaSeparatedString() ?? "null"};";
 
         public Document AsDocument() =>
             new Document()
@@ -162,7 +168,7 @@ namespace Microsoft.Azure.Search.Tests
                 ["lastRenovationDate"] = LastRenovationDate,
                 ["location"] = Location,
                 ["parkingIncluded"] = ParkingIncluded,
-                ["rating"] = Rating.HasValue ? (long?)Rating.Value : null, // JSON.NET always deserializes to int64
+                ["rating"] = Rating.HasValue ? (long?) Rating.Value : null, // JSON.NET always deserializes to int64
                 ["pastRatings"] = PastRatings != null ? PastRatings : new double[0],
                 ["pastAwards"] = PastAwards != null ? PastAwards: new int[0],
                 ["smokingAllowed"] = SmokingAllowed,
