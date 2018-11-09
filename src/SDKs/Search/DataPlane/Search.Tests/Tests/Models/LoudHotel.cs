@@ -15,6 +15,9 @@ namespace Microsoft.Azure.Search.Tests
         [CustomField("hotelId")]
         public string HOTELID { get; set; }
 
+        [CustomField("address")]
+        public Address ADDRESS { get; set; }
+
         [CustomField("baseRate")]
         public double BASERATE { get; set; }
 
@@ -37,6 +40,12 @@ namespace Microsoft.Azure.Search.Tests
         [CustomField("parkingIncluded")]
         public bool PARKINGINCLUDED { get; set; }
 
+        [CustomField("pastAwards")]
+        public int[] PASTAWARDS { get; set; }
+
+        [CustomField("pastRatings")]
+        public double[] PASTRATINGS{ get; set; }
+
         [CustomField("smokingAllowed")]
         public bool SMOKINGALLOWED { get; set; }
 
@@ -45,6 +54,9 @@ namespace Microsoft.Azure.Search.Tests
 
         [CustomField("rating")]
         public int RATING { get; set; }
+
+        [CustomField("rooms")]
+        public Room[] ROOMS { get; set; }
 
         [CustomField("location")]
         [JsonProperty(NullValueHandling = NullValueHandling.Include)]
@@ -81,11 +93,16 @@ namespace Microsoft.Azure.Search.Tests
             $"Description (French): {DESCRIPTIONFRENCH}; Name: {HOTELNAME}; Category: {CATEGORY}; " +
             $"Tags: {TAGS?.ToCommaSeparatedString() ?? "null"}; Parking: {PARKINGINCLUDED}; " +
             $"Smoking: {SMOKINGALLOWED}; LastRenovationDate: {LASTRENOVATIONDATE}; Rating: {RATING}; " +
-            $"Location: [{LOCATION?.Longitude ?? 0}, {LOCATION?.Latitude ?? 0}]";
+            $"PastRatings: {PASTRATINGS?.ToCommaSeparatedString() ?? "null"}; " +
+            $"PastAwards: {PASTAWARDS?.ToCommaSeparatedString() ?? "null"}; " +
+            $"Location: [{LOCATION?.Longitude ?? 0}, {LOCATION?.Latitude ?? 0}]" +
+            $"Address: {ADDRESS.ToString()};" +
+            $"Rooms: {ROOMS?.ToCommaSeparatedString() ?? "null"};";
 
         public Hotel ToHotel() =>
             new Hotel()
             {
+                Address = ADDRESS,
                 BaseRate = BASERATE,
                 Category = CATEGORY,
                 Description = DESCRIPTION,
@@ -95,7 +112,10 @@ namespace Microsoft.Azure.Search.Tests
                 LastRenovationDate = LASTRENOVATIONDATE,
                 Location = LOCATION,
                 ParkingIncluded = PARKINGINCLUDED,
+                PastAwards = PASTAWARDS,
+                PastRatings = PASTRATINGS,
                 Rating = RATING,
+                Rooms = ROOMS,
                 SmokingAllowed = SMOKINGALLOWED,
                 Tags = TAGS
             };

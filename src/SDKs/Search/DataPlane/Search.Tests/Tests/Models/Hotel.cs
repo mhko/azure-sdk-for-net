@@ -84,6 +84,8 @@ namespace Microsoft.Azure.Search.Tests
     {
         public string HotelId { get; set; }
 
+        public Address Address { get; set; }
+
         public double? BaseRate { get; set; }
 
         public string Description { get; set; }
@@ -98,21 +100,19 @@ namespace Microsoft.Azure.Search.Tests
 
         public bool? ParkingIncluded { get; set; }
 
+        public int[] PastAwards { get; set; }
+
+        public double[] PastRatings { get; set; }
+
         public bool? SmokingAllowed { get; set; }
 
         public DateTimeOffset? LastRenovationDate { get; set; }
 
         public int? Rating { get; set; }
 
-        public double[] PastRatings { get; set; }
-
-        public int[] PastAwards { get; set; }
+        public Room[] Rooms { get; set; }
 
         public GeographyPoint Location { get; set; }
-
-        public Address Address { get; set; }
-
-        public Room[] Rooms { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -125,6 +125,7 @@ namespace Microsoft.Azure.Search.Tests
 
             return
                 HotelId == other.HotelId &&
+                ((Address == null) ? other.Address == null : Address.Equals(other.Address)) &&
                 DoublesEqual(BaseRate, other.BaseRate) &&
                 Description == other.Description &&
                 DescriptionFr == other.DescriptionFr &&
@@ -132,13 +133,12 @@ namespace Microsoft.Azure.Search.Tests
                 Category == other.Category &&
                 ((Tags == null) ? (other.Tags == null || other.Tags.Length == 0) : Tags.SequenceEqual(other.Tags ?? new string[0])) &&
                 ParkingIncluded == other.ParkingIncluded &&
+                ((PastAwards == null) ? (other.PastAwards == null || other.PastAwards.Length == 0) : PastAwards.SequenceEqual(other.PastAwards ?? new int[0])) &&
+                ((PastRatings == null) ? (other.PastRatings == null || other.PastRatings.Length == 0) : PastRatings.SequenceEqual(other.PastRatings ?? new double[0])) &&
                 SmokingAllowed == other.SmokingAllowed &&
                 DateTimeOffsetsEqual(LastRenovationDate, other.LastRenovationDate) &&
                 Rating == other.Rating &&
-                ((PastRatings == null) ? (other.PastRatings == null || other.PastRatings.Length == 0) : PastRatings.SequenceEqual(other.PastRatings ?? new double[0])) &&
-                ((PastAwards == null) ? (other.PastAwards == null || other.PastAwards.Length == 0) : PastAwards.SequenceEqual(other.PastAwards ?? new int[0])) &&
                 ((Rooms == null) ? (other.Rooms == null || other.Rooms.Length == 0) : Rooms.SequenceEqual(other.Rooms ?? new Room[0])) &&
-                ((Address == null) ? other.Address == null : Address.Equals(other.Address)) &&
                 ((Location == null) ? other.Location == null : Location.Equals(other.Location));
         }
 
