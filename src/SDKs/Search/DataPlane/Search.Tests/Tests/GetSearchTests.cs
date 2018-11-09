@@ -16,9 +16,21 @@ namespace Microsoft.Azure.Search.Tests
         }
 
         [Fact]
+        public void CanSearchStaticallyTypedComplexDocuments()
+        {
+            Run(TestCanSearchStaticallyTypedComplexDocuments);
+        }
+
+        [Fact]
         public void CanSearchDynamicDocuments()
         {
             Run(TestCanSearchDynamicDocuments);
+        }
+
+        [Fact]
+        public void CanSearchDynamicComplexDocuments()
+        {
+            Run(TestCanSearchDynamicComplexDocuments);
         }
 
         [Fact]

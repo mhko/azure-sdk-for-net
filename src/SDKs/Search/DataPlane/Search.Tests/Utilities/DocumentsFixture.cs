@@ -34,7 +34,31 @@ namespace Microsoft.Azure.Search.Tests.Utilities
                     SmokingAllowed = false,
                     LastRenovationDate = new DateTimeOffset(2010, 6, 27, 0, 0, 0, TimeSpan.Zero),
                     Rating = 5,
-                    Location = GeographyPoint.Create(47.678581, -122.131577)
+                    Location = GeographyPoint.Create(47.678581, -122.131577),
+                    Address = new Address()
+                    {
+                        City = "Bellevue",
+                        Street = "11025 NE 8th St"
+                    },
+                    PastAwards = new[] { 1, 2, 3 },
+                    PastRatings = new[] { 1.1, 2.2, 3.3 },
+                    Rooms = new []
+                    {
+                        new Room()
+                        {
+                            RoomId = "101",
+                            SleepCount = 4,
+                            BaseRate = 99.00,
+                            Type = "Two Double Beds"
+                        },
+                        new Room()
+                        {
+                            RoomId = "102",
+                            SleepCount = 2,
+                            BaseRate = 49.00,
+                            Type = "One Queen Bed"
+                        }
+                    }
                 },
                 new Hotel()
                 {
@@ -49,7 +73,31 @@ namespace Microsoft.Azure.Search.Tests.Utilities
                     SmokingAllowed = true,
                     LastRenovationDate = new DateTimeOffset(1982, 4, 28, 0, 0, 0, TimeSpan.Zero),   //aka.ms/sre-codescan/disable
                     Rating = 1,
-                    Location = GeographyPoint.Create(49.678581, -122.131577)
+                    Location = GeographyPoint.Create(49.678581, -122.131577),
+                    Address = new Address()
+                    {
+                        City = "Redmond",
+                        Street = "One Microsoft Way"
+                    },
+                    PastAwards = new[] { 1, 2, 3 },
+                    PastRatings = new[] { 1.1, 2.2, 3.3 },
+                    Rooms = new []
+                    {
+                        new Room()
+                        {
+                            RoomId = "A",
+                            SleepCount = 4,
+                            BaseRate = 2.00,
+                            Type = "Two Double Beds"
+                        },
+                        new Room()
+                        {
+                            RoomId = "B",
+                            SleepCount = 2,
+                            BaseRate = 3.50,
+                            Type = "One Queen Bed"
+                        }
+                    }
                 },
                 new Hotel()
                 {

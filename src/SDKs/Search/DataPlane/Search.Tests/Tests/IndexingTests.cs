@@ -341,8 +341,8 @@ namespace Microsoft.Azure.Search.Tests
                             Location = GeographyPoint.Create(47.678581, -122.131577),
                             Address = new Address()
                             {
-                                City = "Waterloo",
-                                Street = "Mountbatten Ave"
+                                City = "Bellevue",
+                                Street = "11025 NE 8th St"
                             },
                             PastAwards = new[] { 1, 2, 3 },
                             PastRatings = new[] { 1.1, 2.2, 3.3 },
@@ -423,15 +423,15 @@ namespace Microsoft.Azure.Search.Tests
                 };
 
                 AzureOperationResponse<DocumentSearchResult<Hotel>> response =
-                    client.Documents.SearchWithHttpMessagesAsync<Hotel>("Waterloo", searchParameters).Result;
+                    client.Documents.SearchWithHttpMessagesAsync<Hotel>("Bellevue", searchParameters).Result;
 
                 // Test Count
                 Assert.Equal(1, response.Body.Results.Count);
 
                 HitHighlights highlights = response.Body.Results[0].Highlights;
                 Assert.True(highlights != null);
-                Assert.Equal("*Waterloo*", highlights["address/city"].ElementAt(0));
-                Assert.Equal("Waterloo", response.Body.Results[0].Document.Address.City);
+                Assert.Equal("*Bellevue*", highlights["address/city"].ElementAt(0));
+                Assert.Equal("Bellevue", response.Body.Results[0].Document.Address.City);
 
                 // Test Facets
                 FacetResults facets = response.Body.Facets;
@@ -445,8 +445,8 @@ namespace Microsoft.Azure.Search.Tests
 
                 Address expectedAddress = new Address()
                 {
-                    City = "Waterloo",
-                    Street = "Mountbatten Ave"
+                    City = "Bellevue",
+                    Street = "11025 NE 8th St"
                 };
 
                 Assert.Equal(expectedAddress, hotel.Address);

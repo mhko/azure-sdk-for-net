@@ -159,6 +159,7 @@ namespace Microsoft.Azure.Search.Tests
         public Document AsDocument() =>
             new Document()
             {
+                ["address"] = Address?.AsDocument(),
                 ["baseRate"] = BaseRate,
                 ["category"] = Category,
                 ["description"] = Description,
@@ -168,13 +169,12 @@ namespace Microsoft.Azure.Search.Tests
                 ["lastRenovationDate"] = LastRenovationDate,
                 ["location"] = Location,
                 ["parkingIncluded"] = ParkingIncluded,
-                ["rating"] = Rating.HasValue ? (long?) Rating.Value : null, // JSON.NET always deserializes to int64
+                ["pastAwards"] = PastAwards != null ? PastAwards : new int[0],
                 ["pastRatings"] = PastRatings != null ? PastRatings : new double[0],
-                ["pastAwards"] = PastAwards != null ? PastAwards: new int[0],
+                ["rating"] = Rating.HasValue ? (long?) Rating.Value : null, // JSON.NET always deserializes to int64
+                ["rooms"] = Rooms != null ? Rooms.Select(x => x.AsDocument()).ToArray() : new Document[0],
                 ["smokingAllowed"] = SmokingAllowed,
-                ["tags"] = Tags ?? new string[0],   // OData always gives [] instead of null for collections.
-                ["address"] = Address?.AsDocument(),
-                ["rooms"] = Rooms != null ? Rooms.Select(x => x.AsDocument()) : new Document[0]
+                ["tags"] = Tags ?? new string[0]   // OData always gives [] instead of null for collections.
             };
 
         public static bool DoublesEqual(double? x, double? y)
